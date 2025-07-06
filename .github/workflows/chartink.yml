@@ -2,8 +2,8 @@ name: 🕒 Chartink Scraper (Every Hour)
 
 on:
   schedule:
-    - cron: "0 * * * *"  # Every hour at minute 0 (UTC)
-  workflow_dispatch:     # Allow manual trigger from GitHub
+    - cron: "30 * * * *"  # Every hour in IST
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -15,6 +15,14 @@ jobs:
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v3
+
+      - name: 🕒 Print current time (UTC & IST)
+        run: |
+          echo "🕒 UTC Time:"
+          date
+
+          echo "🇮🇳 IST Time:"
+          TZ="Asia/Kolkata" date
 
       - name: 🐍 Set up Python
         uses: actions/setup-python@v4
@@ -29,4 +37,4 @@ jobs:
 
       - name: 🚀 Run Chartink Scraper
         run: |
-          python p3.py  # replace with your actual script filename
+          python your_script.py  # replace with your actual script
