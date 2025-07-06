@@ -6,7 +6,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
 def get_google_credentials():
-    raw_json = os.environ.get("NEW")
+    raw_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
     if not raw_json:
         raise Exception("Environment variable NEW is not set.")
     json_dict = json.loads(raw_json)
