@@ -37,4 +37,4 @@ jobs:
 
       - name: 🚀 Run Chartink Scraper
         run: |
-          python your_script.py  # replace with your actual script
+          python p3.py  # replace with your actual script
