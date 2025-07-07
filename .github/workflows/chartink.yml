@@ -36,4 +36,4 @@ jobs:
           python -m playwright install
 
       - name: 🚀 Run p2 Scraper
-        run: python p2.py
+        run: python p3.py
