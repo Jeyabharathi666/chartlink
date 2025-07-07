@@ -23,11 +23,6 @@ jobs:
 
           echo "🇮🇳 IST Time:"
           TZ="Asia/Kolkata" date
-      - name: 📤 Upload screenshots for debug
-        uses: actions/upload-artifact@v3
-        with:
-          name: chartink-screenshots
-          path: "*.png"
 
 
       - name: 🐍 Set up Python
