@@ -1,8 +1,8 @@
-name: 🕒 Chartink Scraper (Every Hour)
+name: Business Standard Scraper (Every Hour)
 
 on:
   schedule:
-    - cron: "30 * * * *"  # Every hour in IST
+    - cron: "30 * * * *"  # Every hour in UTC
   workflow_dispatch:
 
 jobs:
@@ -13,30 +13,26 @@ jobs:
       GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
 
     steps:
-      - name: 📦 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: 🕒 Print current time (UTC & IST)
+      - name: Print Current Time
         run: |
-          echo "🕒 UTC Time:"
+          echo "UTC Time:"
           date
-
-          echo "🇮🇳 IST Time:"
+          echo "IST Time:"
           TZ="Asia/Kolkata" date
 
-
-      - name: 🐍 Set up Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: 📦 Install Dependencies
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install playwright gspread oauth2client
           pip install -r requirements.txt
           playwright install
 
-      - name: 🚀 Run Chartink Scraper
-        run: |
-          python new.py  
+      - name: Run Business Standard Scraper
+        run: python business_standard_scraper.py
