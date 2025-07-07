@@ -36,4 +36,4 @@ jobs:
 
 
       - name: Run Business Standard Scraper
-        run: python business_standard_scraper.py
+        run: python p3.py
