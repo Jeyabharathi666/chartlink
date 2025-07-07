@@ -23,7 +23,7 @@ scope = [
   "https://www.googleapis.com/auth/drive"
 ]
 
-google_credentials_json = os.getenv('GOOGLE_CREDENTIALS')
+google_credentials_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
 google_credentials_dict = json.loads(google_credentials_json)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(
     google_credentials_dict, scope
