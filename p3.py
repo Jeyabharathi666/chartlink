@@ -23,7 +23,7 @@ def scrape_chartink(URL, worksheet_name):
         page.goto(URL)
 
         print("📊 Waiting for table to load...")
-        page.wait_for_selector("table.table-striped.scan_results_table tbody tr:nth-child(2)", timeout=15000)
+        page.wait_for_selector("table.table-striped.scan_results_table tbody tr", timeout=15000)
         time.sleep(3)  # allow time for AJAX rows to load
 
         page.screenshot(path=f"{worksheet_name}_debug.png", full_page=True)
