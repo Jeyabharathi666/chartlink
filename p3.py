@@ -17,7 +17,7 @@ def scrape_chartink(URL, worksheet_name):
     print(f"🌐 Loading: {URL}")
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
         page = context.new_page()
         page.goto(URL)
