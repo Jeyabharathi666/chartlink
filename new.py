@@ -11,11 +11,13 @@ spreadsheet_name = "BusinessStandard"
 worksheet_name = "reports"
 
 # Auth
-scope = ['https://www.googleapis.com/auth/spreadsheets',
-         'https://www.googleapis.com/auth/drive.file',
-         'https://www.googleapis.com/auth/drive']
+scope = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive.file',
+    'https://www.googleapis.com/auth/drive'
+]
 
-google_credentials_json = os.getenv('GOOGLE_CREDENTIALS')
+google_credentials_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')  # for GitHub Actions
 google_credentials_dict = json.loads(google_credentials_json)
 
 creds = ServiceAccountCredentials.from_json_keyfile_dict(
@@ -26,73 +28,79 @@ def parse_html(html_text):
     soup = BeautifulSoup(html_text, "html.parser")
     cards = soup.select(".listing-txt")
 
-    records = []
+    data = []
 
     for card in cards:
         try:
             title = card.select_one("h2 a").get_text(strip=True)
             summary = card.select_one("p").get_text(strip=True)
             date = card.select_one(".date").get_text(strip=True)
-            records.append({
+            data.append({
                 "Date": date,
                 "Title": title,
                 "Summary": summary
             })
         except Exception as e:
-            print("Error parsing:", e)
+            print("Parse error:", e)
 
-    return pd.DataFrame(records)
+    return pd.DataFrame(data)
 
-def scrape_via_playwright():
+def fetch_ajax_html(offset, page, timeout=8000):
+    ajax_html = None
+
+    def handle_response(response):
+        nonlocal ajax_html
+        if "bs_marketresearchreport_list_ajax" in response.url and f"offset={offset}" in response.url:
+            if response.status == 200:
+                ajax_html = response.text()
+
+    page.on("response", handle_response)
+
+    url = f"https://www.business-standard.com/markets/research-report"
+    print(f"Loading offset {offset}...")
+    page.goto(url)
+    page.wait_for_timeout(2000)
+    page.evaluate(f"window.scrollTo(0, {offset * 300})")
+    page.wait_for_timeout(timeout)
+
+    return ajax_html
+
+def scrape_all_pages():
+    all_data = pd.DataFrame()
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        context = browser.new_context()
+        page = context.new_page()
 
-        html_fragment = None
+        for offset in [0, 10, 20]:  # Add more offsets as needed
+            html = fetch_ajax_html(offset, page)
+            if html:
+                df = parse_html(html)
+                all_data = pd.concat([all_data, df], ignore_index=True)
+            else:
+                print(f"No data for offset {offset}")
 
-        def handle_response(response):
-            nonlocal html_fragment
-            if "bs_marketresearchreport_list_ajax" in response.url and response.status == 200:
-                html_fragment = response.text()
+        browser.close()
+    return all_data
 
-        page.on("response", handle_response)
-
-        page.goto("https://www.business-standard.com/markets/research-report", timeout=60000)
-        page.wait_for_timeout(3000)
-        page.mouse.wheel(0, 3000)
-        page.wait_for_timeout(5000)
-
-        if html_fragment:
-            df = parse_html(html_fragment)
-            browser.close()
-            return df
-        else:
-            print("Failed to capture AJAX response.")
-            browser.close()
-            return pd.DataFrame()
-
-def update_sheet(dataframe):
-    if dataframe.empty:
+def update_sheet(df):
+    if df.empty:
         print("No data to update.")
         return
 
-    dataframe = dataframe.sort_values(by="Date", ascending=False)
+    df = df.sort_values(by="Date", ascending=False)
 
     try:
         sheet = client.open(spreadsheet_name).worksheet(worksheet_name)
     except gspread.exceptions.WorksheetNotFound:
-        sheet = client.open(spreadsheet_name).add_worksheet(worksheet_name, rows=100, cols=20)
+        sheet = client.open(spreadsheet_name).add_worksheet(title=worksheet_name, rows="100", cols="20")
 
     sheet.clear()
-    sheet.update([dataframe.columns.tolist()] + dataframe.values.tolist())
-    print("Google Sheet updated.")
+    sheet.update([df.columns.tolist()] + df.values.tolist())
+    print("✅ Google Sheet updated.")
 
 if __name__ == "__main__":
-    print("Starting scrape...")
-    df = scrape_via_playwright()
-    update_sheet(df)
-
-  futures = [ executor.submit(GetDataFromChartink, f"{conditions[i]}", f"p{i+1}") for i in range(total_conditions)]
-  print("[+] Getting data from chart link please wait...")
-  wait(futures)
-  print("[+] Successfully Updated the Data to sheet")
+    print("🚀 Scraping Business Standard Reports...")
+    data = scrape_all_pages()
+    update_sheet(data)
