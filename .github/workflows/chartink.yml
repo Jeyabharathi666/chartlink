@@ -1,9 +1,8 @@
-name: Business Standard Scraper (Every Hour)
+name:  (Every 5 Minutes)
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
-  # Every hour in UTC
+    - cron: "*/5 * * * *"  # <-- runs every 5 minutes (UTC)
   workflow_dispatch:
 
 jobs:
@@ -34,7 +33,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           python -m playwright install
-
 
       - name: Run Business Standard Scraper
         run: python p3.py
