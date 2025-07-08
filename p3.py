@@ -8,9 +8,10 @@ URL = ["https://chartink.com/screener/copy-copy-copy-sreelakshmi-guruvayoorappan
        "https://chartink.com/screener/agp-bullish2-p5",
        "https://chartink.com/screener/1-longtrend-ve",
        "https://chartink.com/screener/copy-copy-down-tranding-buy-at-low-7",
-       "https://chartink.com/screener/copy-akshat-monthly-momentum-37"]
+       "https://chartink.com/screener/copy-akshat-monthly-momentum-37",
+       "https://chartink.com/screener/agp-shesha-bulloong1"]
 sheet_id = "1NscvYkls78jH3-t28grkSoKJTmWQvdPSulHXgAYFjwg"
-worksheet_name = ["p1","p2","p3","p4","p5","p6","p7"]
+worksheet_name = ["p1","p2","p3","p4","p5","p6","p7","p8"]
 
 def scrape_chartink(URL, worksheet_name):
     print(f"🚀 Starting Chartink scrape for {worksheet_name}...")
