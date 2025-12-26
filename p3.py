@@ -97,8 +97,11 @@ def scrape_chartink(url, worksheet_name):
                 rows = [[""]]
             else:
                 try:
+                    '''page.wait_for_selector("div.relative table tbody tr", timeout=60000)
+                    table_rows = page.query_selector_all("div.relative table tbody tr")'''
                     page.wait_for_selector("div.relative table tbody tr", timeout=60000)
                     table_rows = page.query_selector_all("div.relative table tbody tr")
+
                     print(f"📥 Extracted {len(table_rows)} rows.")
 
                     rows = []
@@ -139,4 +142,5 @@ def scrape_chartink(url, worksheet_name):
 for index, url in enumerate(URLS):
     scrape_chartink(url, worksheet_names[index])
     print(f"⏱️ Finished updating '{worksheet_names[index]}'")
+
 
